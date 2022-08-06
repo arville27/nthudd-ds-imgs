@@ -1,0 +1,4 @@
+cmake==3.22.5
+dlib==19.24.0
+numpy==1.23.0
+opencv-python==4.6.0.66
