@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import cv2
 import dlib
 from Utility import Category, LabelClass
@@ -134,6 +134,34 @@ class ImageExtractor:
                     f"Processed {self.__total_processed_frame} total frames",
                     self.__logger.info,
                 )
+
+    def check_entry(self, entry) -> Tuple[bool, int, int]:
+        video_path = entry["video_path"]
+        label_path = entry["label_path"]
+
+        cap = cv2.VideoCapture(video_path)
+
+        label_count = int(len(utils.read_file(label_path)))
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        return (frame_count == label_count, frame_count, label_count)
+
+    def check_label_completion(self) -> None:
+        all_match = True
+        for category in Category:
+            for entry in self.__files_map.get(category.value):
+                match_status, frame_count, label_count = self.check_entry(entry)
+                if all_match and not match_status:
+                    utils.log_stdout(
+                        "There are one or more entries that cannot be processed due to an error in the number of frames and labels",
+                        self.__logger.error,
+                    )
+                    all_match = False
+                if not match_status:
+                    utils.log_stdout(
+                        f"Video {entry['video_path']}\nWith frame count: {frame_count}\nLabel count: {label_count}\n",
+                        self.__logger.error,
+                    )
+        return all_match
 
     def execute(self) -> None:
         for category in Category:

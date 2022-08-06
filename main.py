@@ -35,12 +35,24 @@ def main(args):
         )
         exit(1)
 
-    ImageExtractor(
+    imgs_extractor = ImageExtractor(
         logger=logger,
         total_processed_frame=0,
         files_map=files_map,
         extract_target_path=extract_target_path,
-    ).execute()
+    )
+
+    if not imgs_extractor.check_label_completion():
+        utils.log_stdout(
+            "Exiting...",
+            logger.error,
+        )
+        exit(1)
+    else:
+        print(f"{type} datasets is complete and ready to be processed")
+
+    if not args.only_check:
+        imgs_extractor.execute()
 
 
 if __name__ == "__main__":
@@ -56,6 +68,12 @@ if __name__ == "__main__":
         "--execute-path-extract",
         action="store_true",
         help="Execute path_extractor before process datasets",
+    )
+
+    parser.add_argument(
+        "--only-check",
+        action="store_true",
+        help="Only check datasets completion without processing",
     )
 
     args = parser.parse_args()
