@@ -9,6 +9,16 @@ def read_file(filename: Path | str) -> str:
         return f.read()
 
 
+def write_file(filename: Path | str, content: str) -> bool:
+    try:
+        with open(filename, "w") as f:
+            f.write(content)
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
 def read_json(filename: Path | str) -> Dict | list:
     return json.loads(read_file(filename))
 

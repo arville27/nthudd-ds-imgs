@@ -42,7 +42,7 @@ def main(args):
         extract_target_path=extract_target_path,
     )
 
-    if not imgs_extractor.check_label_completion():
+    if not imgs_extractor.check_label_completion(args.populate_missing_label):
         utils.log_stdout(
             "Exiting...",
             logger.error,

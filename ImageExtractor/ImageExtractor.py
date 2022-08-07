@@ -7,6 +7,7 @@ from Utility import Category, LabelClass
 import os
 import utils
 import numpy as np
+import re
 
 
 class ImageExtractor:
@@ -145,7 +146,40 @@ class ImageExtractor:
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         return (frame_count == label_count, frame_count, label_count)
 
-    def check_label_completion(self) -> None:
+    def populate_missing_label_val(self, entry, frame_count, label_count) -> None:
+        label_path = entry["label_path"]
+        label_content = utils.read_file(label_path)
+
+        missing_value_count = frame_count - label_count
+        if missing_value_count > 0 and missing_value_count < 4:
+            utils.log_stdout(
+                f"Automatically infer missing value by its last value, because missing value is less than 4\n",
+                self.__logger.info,
+            )
+            label_content += label_content[label_count - 1] * missing_value_count
+        elif missing_value_count > 0:
+            status = True
+            while status:
+                user_inputed_missing_val = input(
+                    f"Enter {missing_value_count} digits (0,1), each digit is representing label for corresponding frame"
+                )
+                if (
+                    len(user_inputed_missing_val) > missing_value_count
+                    or re.match(r"^[^2-9A-z]+$", user_inputed_missing_val) is None
+                ):
+                    print(
+                        f"Please input {missing_value_count} digits characters, consisting only 1 and 0"
+                    )
+                    continue
+                status = False
+            label_content += user_inputed_missing_val
+            utils.log_stdout(
+                f"Succesfully append missing value in {label_path} file with user inputed characters ({user_inputed_missing_val})\n",
+                self.__logger.info,
+            )
+        utils.write_file(label_path, label_content)
+
+    def check_label_completion(self, populate_missing_val: bool) -> None:
         all_match = True
         for category in Category:
             for entry in self.__files_map.get(category.value):
@@ -158,9 +192,21 @@ class ImageExtractor:
                     all_match = False
                 if not match_status:
                     utils.log_stdout(
-                        f"Video {entry['video_path']}\nWith frame count: {frame_count}\nLabel count: {label_count}\n",
+                        f"Video {entry['video_path']}, Label {entry['label_path']}\nWith frame count: {frame_count}\nLabel count: {label_count}",
                         self.__logger.error,
                     )
+                    if populate_missing_val:
+                        if frame_count - label_count > 0:
+                            self.populate_missing_label_val(
+                                entry, frame_count, label_count
+                            )
+                        else:
+                            utils.log_stdout(
+                                "Please manually verify the label content",
+                                self.__logger.warn,
+                            )
+                    else:
+                        utils.log_stdout("", self.__logger.info)
         return all_match
 
     def execute(self) -> None:
