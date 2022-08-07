@@ -45,5 +45,5 @@ class TestingImageExtractor(ImageExtractor):
                 self.process_entry(entry)
                 utils.log_stdout(
                     f"Finish processing video {entry['video_path']}\n",
-                    super().__logger.info,
+                    self._ImageExtractor__logger.info,
                 )
