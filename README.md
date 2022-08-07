@@ -16,7 +16,7 @@ pip install -r requirements.txt
 python main.py -h
 ```
 ```
-usage: main.py [-h] [--execute-path-extract] {training,evaluation,testing}
+usage: main.py [-h] [--execute-path-extract] [--only-check] [--populate-missing-label] {training,evaluation,testing}
 
 NTHU-DD Datasets preprocessor
 
@@ -28,5 +28,8 @@ options:
   -h, --help            show this help message and exit
   --execute-path-extract
                         Execute path_extractor before process datasets
+  --only-check          Only check datasets completion without processing
+  --populate-missing-label
+                        Automatically populate label missing value either by infer its value or ask user depending by its missing value length
 ```
 
