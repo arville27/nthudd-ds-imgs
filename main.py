@@ -3,7 +3,7 @@ import path_extractor
 import config
 import utils
 import argparse
-from ImageExtractor import ImageExtractor
+from ImageExtractor import ImageExtractor, TestingImageExtractor
 from pathlib import Path
 
 
@@ -35,12 +35,20 @@ def main(args):
         )
         exit(1)
 
-    imgs_extractor = ImageExtractor(
-        logger=logger,
-        total_processed_frame=0,
-        files_map=files_map,
-        extract_target_path=extract_target_path,
-    )
+    if type == "testing":
+        imgs_extractor = TestingImageExtractor(
+            logger=logger,
+            total_processed_frame=0,
+            files_map=files_map,
+            extract_target_path=extract_target_path,
+        )
+    else:
+        imgs_extractor = ImageExtractor(
+            logger=logger,
+            total_processed_frame=0,
+            files_map=files_map,
+            extract_target_path=extract_target_path,
+        )
 
     if not imgs_extractor.check_label_completion(args.populate_missing_label):
         utils.log_stdout(
@@ -74,6 +82,12 @@ if __name__ == "__main__":
         "--only-check",
         action="store_true",
         help="Only check datasets completion without processing",
+    )
+
+    parser.add_argument(
+        "--populate-missing-label",
+        action="store_true",
+        help="Automatically populate label missing value either by infer its value or ask user depending by its missing value length",
     )
 
     args = parser.parse_args()
