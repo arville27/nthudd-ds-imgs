@@ -6,13 +6,13 @@ from typing import Dict
 
 def read_file(filename: Path | str) -> str:
     with open(filename, "r") as f:
-        return f.read()
+        return f.read().strip()
 
 
 def write_file(filename: Path | str, content: str) -> bool:
     try:
         with open(filename, "w") as f:
-            f.write(content)
+            f.write(content.strip())
         return True
     except Exception as e:
         print(e)

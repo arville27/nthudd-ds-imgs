@@ -202,7 +202,7 @@ class ImageExtractor:
                             )
                         else:
                             utils.log_stdout(
-                                "Please manually verify the label content",
+                                "Please manually verify the label content\n",
                                 self.__logger.warn,
                             )
                     else:
